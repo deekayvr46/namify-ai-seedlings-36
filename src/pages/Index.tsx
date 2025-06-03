@@ -9,7 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Star, Share2, Baby, Sparkles, Moon, Sun } from 'lucide-react';
+import { Heart, Star, Share2, Baby, Sparkles, Moon, Sun, ChevronDown, ChevronUp, Settings } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { toast } from "@/hooks/use-toast";
 import NameCard from '@/components/NameCard';
 import AIChat from '@/components/AIChat';
@@ -64,6 +65,7 @@ const Index = () => {
   const [favorites, setFavorites] = useState<GeneratedName[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState('generator');
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const religions = ['Hindu', 'Christian', 'Muslim', 'Sikh', 'Buddhist', 'Jewish', 'Other'];
   const cultures = ['Sanskrit', 'Tamil', 'Hindi', 'Arabic', 'Western', 'Modern', 'Traditional', 'Hebrew', 'Greek'];
@@ -95,7 +97,7 @@ const Index = () => {
     if (!preferences.fatherName || !preferences.motherName || !preferences.gender) {
       toast({
         title: "Missing Information",
-        description: "Please fill in at least the parent names and baby gender.",
+        description: "Please fill in the parent names and baby gender.",
         variant: "destructive"
       });
       return;
@@ -105,6 +107,7 @@ const Index = () => {
     try {
       const names = await generateNames(preferences);
       setGeneratedNames(names);
+      setActiveTab('results');
       toast({
         title: "Names Generated!",
         description: `Found ${names.length} beautiful name suggestions for you.`,
@@ -147,7 +150,7 @@ const Index = () => {
             <Sparkles className="h-8 w-8 text-pink-600" />
           </div>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Discover the perfect name for your little one with AI-powered suggestions based on culture, meaning, and family preferences.
+            Discover the perfect name for your little one with AI-powered suggestions
           </p>
         </div>
 
@@ -160,40 +163,43 @@ const Index = () => {
           </TabsList>
 
           <TabsContent value="generator">
-            <Card className="w-full max-w-4xl mx-auto">
+            <Card className="w-full max-w-3xl mx-auto">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-center justify-center">
                   <Moon className="h-5 w-5 text-purple-600" />
                   Tell us about your preferences
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="fatherName">Father's Name *</Label>
-                    <Input
-                      id="fatherName"
-                      value={preferences.fatherName}
-                      onChange={(e) => handleInputChange('fatherName', e.target.value)}
-                      placeholder="Enter father's name"
-                    />
+              <CardContent className="space-y-8">
+                {/* Essential Fields */}
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="fatherName" className="text-base font-medium">Father's Name *</Label>
+                      <Input
+                        id="fatherName"
+                        value={preferences.fatherName}
+                        onChange={(e) => handleInputChange('fatherName', e.target.value)}
+                        placeholder="Enter father's name"
+                        className="h-12 text-base"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="motherName" className="text-base font-medium">Mother's Name *</Label>
+                      <Input
+                        id="motherName"
+                        value={preferences.motherName}
+                        onChange={(e) => handleInputChange('motherName', e.target.value)}
+                        placeholder="Enter mother's name"
+                        className="h-12 text-base"
+                      />
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="motherName">Mother's Name *</Label>
-                    <Input
-                      id="motherName"
-                      value={preferences.motherName}
-                      onChange={(e) => handleInputChange('motherName', e.target.value)}
-                      placeholder="Enter mother's name"
-                    />
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label>Baby Gender *</Label>
+                    <Label className="text-base font-medium">Baby Gender *</Label>
                     <Select value={preferences.gender} onValueChange={(value) => handleInputChange('gender', value)}>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-12 text-base">
                         <SelectValue placeholder="Select gender" />
                       </SelectTrigger>
                       <SelectContent>
@@ -203,141 +209,156 @@ const Index = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label>Religion</Label>
-                    <Select value={preferences.religion} onValueChange={(value) => handleInputChange('religion', value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select religion" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {religions.map(religion => (
-                          <SelectItem key={religion} value={religion.toLowerCase()}>{religion}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Cultural Preference</Label>
-                    <Select value={preferences.culture} onValueChange={(value) => handleInputChange('culture', value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select culture" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {cultures.map(culture => (
-                          <SelectItem key={culture} value={culture.toLowerCase()}>{culture}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="startLetter">Preferred Start Letter</Label>
-                    <Input
-                      id="startLetter"
-                      value={preferences.startLetter}
-                      onChange={(e) => handleInputChange('startLetter', e.target.value.toUpperCase())}
-                      placeholder="A"
-                      maxLength={1}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="endLetter">Preferred End Letter</Label>
-                    <Input
-                      id="endLetter"
-                      value={preferences.endLetter}
-                      onChange={(e) => handleInputChange('endLetter', e.target.value.toLowerCase())}
-                      placeholder="a"
-                      maxLength={1}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="mustInclude">Must Include Letters</Label>
-                    <Input
-                      id="mustInclude"
-                      value={preferences.mustInclude}
-                      onChange={(e) => handleInputChange('mustInclude', e.target.value)}
-                      placeholder="ar, sh"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Meaning Preference</Label>
-                  <Select value={preferences.meaningPreference} onValueChange={(value) => handleInputChange('meaningPreference', value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select preferred meaning" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {meanings.map(meaning => (
-                        <SelectItem key={meaning} value={meaning.toLowerCase()}>{meaning}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="siblingNames">Sibling Names (Optional)</Label>
-                  <Input
-                    id="siblingNames"
-                    value={preferences.siblingNames}
-                    onChange={(e) => handleInputChange('siblingNames', e.target.value)}
-                    placeholder="Enter sibling names separated by commas"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="birthDate">Birth Date (Optional)</Label>
-                    <Input
-                      id="birthDate"
-                      type="date"
-                      value={preferences.birthDate}
-                      onChange={(e) => handleInputChange('birthDate', e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="birthTime">Birth Time (Optional)</Label>
-                    <Input
-                      id="birthTime"
-                      type="time"
-                      value={preferences.birthTime}
-                      onChange={(e) => handleInputChange('birthTime', e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <Label>Name Generation Rules</Label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {nameRuleOptions.map((rule) => (
-                      <div key={rule} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={rule}
-                          checked={preferences.nameRules.includes(rule)}
-                          onCheckedChange={(checked) => handleRuleChange(rule, checked as boolean)}
-                        />
-                        <Label htmlFor={rule} className="text-sm">{rule}</Label>
+                {/* Advanced Settings */}
+                <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
+                  <CollapsibleTrigger asChild>
+                    <Button variant="outline" className="w-full h-12 text-base">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Advanced Settings
+                      {showAdvanced ? <ChevronUp className="h-4 w-4 ml-2" /> : <ChevronDown className="h-4 w-4 ml-2" />}
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="space-y-6 mt-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Religion</Label>
+                        <Select value={preferences.religion} onValueChange={(value) => handleInputChange('religion', value)}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select religion" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {religions.map(religion => (
+                              <SelectItem key={religion} value={religion.toLowerCase()}>{religion}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
-                    ))}
-                  </div>
-                </div>
+                      <div className="space-y-2">
+                        <Label>Cultural Preference</Label>
+                        <Select value={preferences.culture} onValueChange={(value) => handleInputChange('culture', value)}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select culture" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {cultures.map(culture => (
+                              <SelectItem key={culture} value={culture.toLowerCase()}>{culture}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="startLetter">Start Letter</Label>
+                        <Input
+                          id="startLetter"
+                          value={preferences.startLetter}
+                          onChange={(e) => handleInputChange('startLetter', e.target.value.toUpperCase())}
+                          placeholder="A"
+                          maxLength={1}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="endLetter">End Letter</Label>
+                        <Input
+                          id="endLetter"
+                          value={preferences.endLetter}
+                          onChange={(e) => handleInputChange('endLetter', e.target.value.toLowerCase())}
+                          placeholder="a"
+                          maxLength={1}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="mustInclude">Must Include</Label>
+                        <Input
+                          id="mustInclude"
+                          value={preferences.mustInclude}
+                          onChange={(e) => handleInputChange('mustInclude', e.target.value)}
+                          placeholder="ar, sh"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Meaning Preference</Label>
+                      <Select value={preferences.meaningPreference} onValueChange={(value) => handleInputChange('meaningPreference', value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select preferred meaning" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {meanings.map(meaning => (
+                            <SelectItem key={meaning} value={meaning.toLowerCase()}>{meaning}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="siblingNames">Sibling Names</Label>
+                      <Input
+                        id="siblingNames"
+                        value={preferences.siblingNames}
+                        onChange={(e) => handleInputChange('siblingNames', e.target.value)}
+                        placeholder="Enter sibling names (optional)"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="birthDate">Birth Date (Optional)</Label>
+                        <Input
+                          id="birthDate"
+                          type="date"
+                          value={preferences.birthDate}
+                          onChange={(e) => handleInputChange('birthDate', e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="birthTime">Birth Time (Optional)</Label>
+                        <Input
+                          id="birthTime"
+                          type="time"
+                          value={preferences.birthTime}
+                          onChange={(e) => handleInputChange('birthTime', e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <Label>Name Generation Rules</Label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {nameRuleOptions.map((rule) => (
+                          <div key={rule} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={rule}
+                              checked={preferences.nameRules.includes(rule)}
+                              onCheckedChange={(checked) => handleRuleChange(rule, checked as boolean)}
+                            />
+                            <Label htmlFor={rule} className="text-sm">{rule}</Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
 
                 <Button 
                   onClick={handleGenerateNames} 
-                  className="w-full h-12 text-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                  className="w-full h-14 text-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
                   disabled={isGenerating}
                 >
                   {isGenerating ? (
                     <div className="flex items-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                       Generating Names...
                     </div>
                   ) : (
                     <div className="flex items-center gap-2">
                       <Sparkles className="h-5 w-5" />
-                      Generate Names
+                      Generate Beautiful Names
                     </div>
                   )}
                 </Button>
