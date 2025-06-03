@@ -166,7 +166,7 @@ Please provide each name in this exact JSON format:
 
 Return an array of 12 such name objects. Focus on names that are meaningful, culturally appropriate, and have beautiful significance.`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -187,10 +187,17 @@ Return an array of 12 such name objects. Focus on names that are meaningful, cul
     });
 
     if (!response.ok) {
-      throw new Error('Failed to generate names');
+      console.error('API Response:', response.status, response.statusText);
+      throw new Error(`API request failed: ${response.status}`);
     }
 
     const data = await response.json();
+    console.log('API Response:', data);
+    
+    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+      throw new Error('Invalid API response format');
+    }
+    
     let generatedText = data.candidates[0].content.parts[0].text;
     
     // Clean up the response to extract JSON
@@ -200,7 +207,6 @@ Return an array of 12 such name objects. Focus on names that are meaningful, cul
     try {
       names = JSON.parse(generatedText);
     } catch (parseError) {
-      // Fallback parsing if JSON is malformed
       console.log('JSON parse failed, using fallback names');
       names = getFallbackNames(preferences);
     }
@@ -258,7 +264,7 @@ User question: ${message}
 
 Please provide a helpful response about baby names. If the user is asking for specific name suggestions, provide 3-5 names with brief explanations. Keep the response conversational and helpful.`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
