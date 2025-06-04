@@ -11,19 +11,8 @@ interface Star {
   color: string;
 }
 
-interface ShootingStar {
-  id: number;
-  x: number;
-  y: number;
-  angle: number;
-  speed: number;
-  length: number;
-  opacity: number;
-}
-
 const MagicalBackground: React.FC = () => {
   const [stars, setStars] = useState<Star[]>([]);
-  const [shootingStars, setShootingStars] = useState<ShootingStar[]>([]);
 
   useEffect(() => {
     // Generate realistic twinkling stars
@@ -45,25 +34,7 @@ const MagicalBackground: React.FC = () => {
       setStars(newStars);
     };
 
-    // Generate occasional shooting stars
-    const generateShootingStars = () => {
-      const newShootingStars: ShootingStar[] = [];
-      for (let i = 0; i < 3; i++) {
-        newShootingStars.push({
-          id: i,
-          x: Math.random() * 120 - 20,
-          y: Math.random() * 40,
-          angle: Math.random() * 30 + 20,
-          speed: Math.random() * 2 + 1,
-          length: Math.random() * 80 + 40,
-          opacity: 0
-        });
-      }
-      setShootingStars(newShootingStars);
-    };
-
     generateStars();
-    generateShootingStars();
   }, []);
 
   return (
@@ -87,25 +58,6 @@ const MagicalBackground: React.FC = () => {
             opacity: star.brightness,
             animation: `twinkle ${star.twinkleSpeed}s ease-in-out infinite alternate`,
             animationDelay: `${Math.random() * 2}s`
-          }}
-        />
-      ))}
-
-      {/* Shooting stars */}
-      {shootingStars.map((shootingStar) => (
-        <div
-          key={shootingStar.id}
-          className="absolute"
-          style={{
-            left: `${shootingStar.x}%`,
-            top: `${shootingStar.y}%`,
-            width: `${shootingStar.length}px`,
-            height: '1px',
-            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent)',
-            transform: `rotate(${shootingStar.angle}deg)`,
-            animation: `shootingStar ${4 + Math.random() * 2}s linear infinite`,
-            animationDelay: `${Math.random() * 5}s`,
-            boxShadow: '0 0 6px rgba(255,255,255,0.8)'
           }}
         />
       ))}
@@ -140,50 +92,6 @@ const MagicalBackground: React.FC = () => {
           filter: 'blur(1px)'
         }}
       />
-
-      {/* Custom animations */}
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          @keyframes twinkle {
-            0%, 100% { 
-              opacity: 0.3;
-              transform: scale(0.8);
-            }
-            50% { 
-              opacity: 1;
-              transform: scale(1);
-            }
-          }
-          
-          @keyframes shootingStar {
-            0% {
-              transform: translateX(-100px) translateY(-100px) rotate(var(--angle, 30deg));
-              opacity: 0;
-            }
-            10% {
-              opacity: 1;
-            }
-            90% {
-              opacity: 0.8;
-            }
-            100% {
-              transform: translateX(200px) translateY(200px) rotate(var(--angle, 30deg));
-              opacity: 0;
-            }
-          }
-          
-          @keyframes pulse {
-            0%, 100% {
-              opacity: 0.1;
-              transform: scale(1);
-            }
-            50% {
-              opacity: 0.3;
-              transform: scale(1.1);
-            }
-          }
-        `
-      }} />
     </div>
   );
 };

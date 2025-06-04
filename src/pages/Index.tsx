@@ -8,12 +8,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Star, Share2, Baby, Sparkles, Moon, Sun, ChevronDown, ChevronUp, Settings } from 'lucide-react';
+import { Heart, Star, Share2, Baby, Sparkles, Moon, Sun, ChevronDown, ChevronUp, Settings, Download, Copy } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { toast } from "@/hooks/use-toast";
 import NameCard from '@/components/NameCard';
 import AIChat from '@/components/AIChat';
 import { generateNames } from '@/utils/nameGenerator';
+import { exportToExcel, copyAllNamesAndMeanings } from '@/utils/excelExport';
 import MagicalBackground from '@/components/MagicalBackground';
 
 interface NamePreferences {
@@ -147,6 +148,48 @@ const Index = () => {
 
   const isFavorite = (name: GeneratedName) => {
     return favorites.some(f => f.name === name.name);
+  };
+
+  const handleExportToExcel = () => {
+    if (generatedNames.length === 0) {
+      toast({
+        title: "No Names to Export",
+        description: "Generate some names first before exporting.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    exportToExcel(generatedNames, 'astroname-suggestions');
+    toast({
+      title: "Excel Export Complete!",
+      description: `Exported ${generatedNames.length} names to CSV file.`,
+    });
+  };
+
+  const handleCopyAllNames = async () => {
+    if (generatedNames.length === 0) {
+      toast({
+        title: "No Names to Copy",
+        description: "Generate some names first before copying.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const success = await copyAllNamesAndMeanings(generatedNames);
+    if (success) {
+      toast({
+        title: "All Names Copied!",
+        description: `Copied ${generatedNames.length} names and meanings to clipboard.`,
+      });
+    } else {
+      toast({
+        title: "Copy Failed",
+        description: "Unable to copy to clipboard.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -404,40 +447,86 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="results">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {generatedNames.map((name, index) => (
-                <NameCard
-                  key={index}
-                  name={name}
-                  isFavorite={isFavorite(name)}
-                  onToggleFavorite={() => toggleFavorite(name)}
-                />
-              ))}
-              {generatedNames.length === 0 && (
-                <div className="col-span-full text-center py-12">
-                  <Sun className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500 text-lg">No names generated yet. Use the generator to create suggestions!</p>
+            <div className="space-y-6">
+              {generatedNames.length > 0 && (
+                <div className="flex flex-wrap gap-3 justify-center">
+                  <Button
+                    onClick={handleCopyAllNames}
+                    variant="outline"
+                    className="bg-white/90 hover:bg-white border-purple-200 text-purple-700"
+                  >
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copy All Names & Meanings
+                  </Button>
+                  <Button
+                    onClick={handleExportToExcel}
+                    variant="outline"
+                    className="bg-white/90 hover:bg-white border-green-200 text-green-700"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Export to Excel
+                  </Button>
                 </div>
               )}
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {generatedNames.map((name, index) => (
+                  <NameCard
+                    key={index}
+                    name={name}
+                    isFavorite={isFavorite(name)}
+                    onToggleFavorite={() => toggleFavorite(name)}
+                  />
+                ))}
+                {generatedNames.length === 0 && (
+                  <div className="col-span-full text-center py-12">
+                    <Sun className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500 text-lg">No names generated yet. Use the generator to create suggestions!</p>
+                  </div>
+                )}
+              </div>
             </div>
           </TabsContent>
 
           <TabsContent value="favorites">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {favorites.map((name, index) => (
-                <NameCard
-                  key={index}
-                  name={name}
-                  isFavorite={true}
-                  onToggleFavorite={() => toggleFavorite(name)}
-                />
-              ))}
-              {favorites.length === 0 && (
-                <div className="col-span-full text-center py-12">
-                  <Heart className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500 text-lg">No favorites yet. Heart the names you love!</p>
+            <div className="space-y-6">
+              {favorites.length > 0 && (
+                <div className="flex flex-wrap gap-3 justify-center">
+                  <Button
+                    onClick={() => copyAllNamesAndMeanings(favorites)}
+                    variant="outline"
+                    className="bg-white/90 hover:bg-white border-purple-200 text-purple-700"
+                  >
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copy Favorites
+                  </Button>
+                  <Button
+                    onClick={() => exportToExcel(favorites, 'favorite-names')}
+                    variant="outline"
+                    className="bg-white/90 hover:bg-white border-green-200 text-green-700"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Export Favorites to Excel
+                  </Button>
                 </div>
               )}
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {favorites.map((name, index) => (
+                  <NameCard
+                    key={index}
+                    name={name}
+                    isFavorite={true}
+                    onToggleFavorite={() => toggleFavorite(name)}
+                  />
+                ))}
+                {favorites.length === 0 && (
+                  <div className="col-span-full text-center py-12">
+                    <Heart className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500 text-lg">No favorites yet. Heart the names you love!</p>
+                  </div>
+                )}
+              </div>
             </div>
           </TabsContent>
 

@@ -1,8 +1,9 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Share2, Star, Volume2, Sparkles, Users } from 'lucide-react';
+import { Heart, Share2, Star, Volume2, Sparkles, Users, Copy } from 'lucide-react';
 import { toast } from "@/hooks/use-toast";
 
 interface GeneratedName {
@@ -39,6 +40,44 @@ const NameCard: React.FC<NameCardProps> = ({ name, isFavorite, onToggleFavorite 
       toast({
         title: "Copied to clipboard!",
         description: "Name details copied to clipboard."
+      });
+    }
+  };
+
+  const handleCopyMeaning = async () => {
+    try {
+      let fullMeaning = `${name.name} - ${name.meaning}`;
+      
+      if (name.parentConnection) {
+        fullMeaning += `\n\nParent Connection: ${name.parentConnection}`;
+      }
+      
+      if (name.derivation) {
+        fullMeaning += `\n\nDerivation: ${name.derivation}`;
+      }
+      
+      fullMeaning += `\n\nOrigin: ${name.origin}`;
+      fullMeaning += `\nGender: ${name.gender}`;
+      fullMeaning += `\nPronunciation: ${name.pronunciation}`;
+      
+      if (name.numerology) {
+        fullMeaning += `\nNumerology: ${name.numerology}`;
+      }
+      
+      if (name.astrology) {
+        fullMeaning += `\nAstrology: ${name.astrology}`;
+      }
+
+      await navigator.clipboard.writeText(fullMeaning);
+      toast({
+        title: "Meaning Copied!",
+        description: "Complete meaning and details copied to clipboard."
+      });
+    } catch (error) {
+      toast({
+        title: "Copy Failed",
+        description: "Unable to copy to clipboard.",
+        variant: "destructive"
       });
     }
   };
@@ -94,6 +133,15 @@ const NameCard: React.FC<NameCardProps> = ({ name, isFavorite, onToggleFavorite 
             </div>
           </div>
           <div className="flex gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCopyMeaning}
+              className="p-2 text-gray-400 hover:text-green-500"
+              title="Copy complete meaning and details"
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
             <Button
               variant="ghost"
               size="sm"
