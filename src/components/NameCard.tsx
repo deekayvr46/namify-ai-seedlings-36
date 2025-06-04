@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Share2, Star, Volume2 } from 'lucide-react';
+import { Heart, Share2, Star, Volume2, Sparkles, Users } from 'lucide-react';
 import { toast } from "@/hooks/use-toast";
 
 interface GeneratedName {
@@ -16,6 +15,8 @@ interface GeneratedName {
   numerology?: number;
   astrology?: string;
   siblingMatch?: boolean;
+  derivation?: string;
+  parentConnection?: string;
 }
 
 interface NameCardProps {
@@ -70,12 +71,13 @@ const NameCard: React.FC<NameCardProps> = ({ name, isFavorite, onToggleFavorite 
   };
 
   return (
-    <Card className="h-full hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-white/80 backdrop-blur-sm">
+    <Card className="h-full hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-white/90 backdrop-blur-sm border border-purple-100/50">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <CardTitle className="text-2xl font-bold text-gray-800 mb-1">
+            <CardTitle className="text-2xl font-bold text-gray-800 mb-1 flex items-center gap-2">
               {name.name}
+              {name.parentConnection && <Users className="h-4 w-4 text-purple-500" />}
             </CardTitle>
             <div className="flex items-center gap-2 mb-2">
               <Button
@@ -117,6 +119,23 @@ const NameCard: React.FC<NameCardProps> = ({ name, isFavorite, onToggleFavorite 
           <h4 className="font-semibold text-gray-700 mb-2">Meaning</h4>
           <p className="text-gray-600 text-sm leading-relaxed">{name.meaning}</p>
         </div>
+
+        {name.parentConnection && (
+          <div className="space-y-2 p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-100">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="h-4 w-4 text-purple-600" />
+              <h4 className="font-semibold text-purple-700 text-sm">Parent Connection</h4>
+            </div>
+            <p className="text-purple-600 text-xs leading-relaxed">{name.parentConnection}</p>
+          </div>
+        )}
+
+        {name.derivation && (
+          <div className="space-y-2 p-3 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg border border-blue-100">
+            <h4 className="font-semibold text-blue-700 text-sm">How It's Derived</h4>
+            <p className="text-blue-600 text-xs leading-relaxed">{name.derivation}</p>
+          </div>
+        )}
 
         <div className="flex flex-wrap gap-2">
           <Badge variant="secondary" className="bg-purple-100 text-purple-800">

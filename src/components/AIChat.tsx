@@ -1,5 +1,4 @@
-
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,11 +40,11 @@ const AIChat: React.FC<AIChatProps> = ({ preferences }) => {
     {
       id: '1',
       type: 'assistant',
-      content: "Hello! I'm your AI name assistant. I can help you explore name ideas, explain meanings, suggest alternatives, or discuss cultural significance. What would you like to know about baby names?",
+      content: "Hello! I'm your AI name assistant for AstroName AI. I can help you explore name ideas, explain meanings, suggest alternatives, or discuss cultural significance. What would you like to know about baby names?",
       timestamp: new Date(),
       suggestions: [
         "Give me modern girl names that start with 'A'",
-        "Suggest Tamil boy names with strong meanings",
+        "Suggest names that blend our parent names",
         "Names that match with my daughter Anika",
         "What are some unique unisex names?"
       ]
@@ -54,14 +53,28 @@ const AIChat: React.FC<AIChatProps> = ({ preferences }) => {
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    const timer = setTimeout(scrollToBottom, 100);
+    return () => clearTimeout(timer);
+  }, [messages, scrollToBottom]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  // Optimized scroll handling for long conversations
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (container && messages.length > 20) {
+      // Auto-cleanup old messages for performance
+      const shouldCleanup = messages.length > 50;
+      if (shouldCleanup) {
+        setMessages(prev => prev.slice(-30)); // Keep last 30 messages
+      }
+    }
+  }, [messages.length]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
@@ -110,21 +123,25 @@ const AIChat: React.FC<AIChatProps> = ({ preferences }) => {
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto h-[600px] flex flex-col">
-      <CardHeader className="pb-3">
+    <Card className="w-full max-w-4xl mx-auto h-[600px] flex flex-col bg-white/95 backdrop-blur-sm border border-purple-100/50">
+      <CardHeader className="pb-3 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-purple-100">
         <CardTitle className="flex items-center gap-2">
           <Bot className="h-5 w-5 text-purple-600" />
-          AI Name Assistant
+          AstroName AI Assistant
           <Sparkles className="h-4 w-4 text-pink-500" />
         </CardTitle>
       </CardHeader>
       
       <CardContent className="flex-1 flex flex-col p-0">
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div 
+          ref={messagesContainerRef}
+          className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth"
+          style={{ scrollBehavior: 'smooth' }}
+        >
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}
             >
               {message.type === 'assistant' && (
                 <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">

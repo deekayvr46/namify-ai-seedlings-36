@@ -14,6 +14,7 @@ interface NamePreferences {
   birthDate: string;
   birthTime: string;
   nameRules: string[];
+  searchType: string; // New field for search types
 }
 
 interface GeneratedName {
@@ -26,11 +27,8 @@ interface GeneratedName {
   numerology?: number;
   astrology?: string;
   siblingMatch?: boolean;
-}
-
-interface ChatResponse {
-  content: string;
-  suggestions?: string[];
+  derivation?: string; // New field for parent name derivation
+  parentConnection?: string; // How it connects to parent names
 }
 
 // Numerology calculation
@@ -76,30 +74,55 @@ const getAstrologySign = (birthDate: string): string => {
 };
 
 // Parent name blending algorithms
-const blendParentNames = (fatherName: string, motherName: string, rules: string[]): string[] => {
-  const blended: string[] = [];
+const blendParentNames = (fatherName: string, motherName: string, rules: string[], searchType: string): { name: string; explanation: string }[] => {
+  const blended: { name: string; explanation: string }[] = [];
   
-  if (rules.includes('First letter from father + last letter from mother')) {
+  if (searchType === 'first-letters' || rules.includes('First letter from father + last letter from mother')) {
     if (fatherName && motherName) {
-      blended.push(fatherName[0] + motherName.slice(-1));
+      const name = fatherName[0] + motherName.slice(-1);
+      blended.push({
+        name: name,
+        explanation: `Combines first letter '${fatherName[0]}' from father's name '${fatherName}' with last letter '${motherName.slice(-1)}' from mother's name '${motherName}'`
+      });
     }
   }
   
-  if (rules.includes('Combination of parent names')) {
+  if (searchType === 'syllable-blend' || rules.includes('Combination of parent names')) {
     if (fatherName && motherName) {
-      // Simple combinations
-      blended.push(fatherName.slice(0, 2) + motherName.slice(-2));
-      blended.push(motherName.slice(0, 2) + fatherName.slice(-2));
-      
-      // Syllable blends
       const fatherMid = Math.floor(fatherName.length / 2);
       const motherMid = Math.floor(motherName.length / 2);
-      blended.push(fatherName.slice(0, fatherMid) + motherName.slice(motherMid));
-      blended.push(motherName.slice(0, motherMid) + fatherName.slice(fatherMid));
+      
+      const blend1 = fatherName.slice(0, fatherMid) + motherName.slice(motherMid);
+      const blend2 = motherName.slice(0, motherMid) + fatherName.slice(fatherMid);
+      
+      blended.push({
+        name: blend1,
+        explanation: `Syllable fusion: '${fatherName.slice(0, fatherMid)}' (first half of ${fatherName}) + '${motherName.slice(motherMid)}' (second half of ${motherName})`
+      });
+      
+      blended.push({
+        name: blend2,
+        explanation: `Syllable fusion: '${motherName.slice(0, motherMid)}' (first half of ${motherName}) + '${fatherName.slice(fatherMid)}' (second half of ${fatherName})`
+      });
     }
   }
   
-  return blended.filter(name => name.length >= 3 && name.length <= 8);
+  if (searchType === 'vowel-consonant') {
+    if (fatherName && motherName) {
+      const fatherVowels = fatherName.match(/[aeiou]/gi) || [];
+      const motherConsonants = motherName.match(/[bcdfghjklmnpqrstvwxyz]/gi) || [];
+      
+      if (fatherVowels.length > 0 && motherConsonants.length > 0) {
+        const name = motherConsonants[0] + fatherVowels[0] + (motherConsonants[1] || '') + (fatherVowels[1] || '');
+        blended.push({
+          name: name,
+          explanation: `Vowel-consonant pattern: Uses vowels from '${fatherName}' (${fatherVowels.join(', ')}) and consonants from '${motherName}' (${motherConsonants.join(', ')})`
+        });
+      }
+    }
+  }
+  
+  return blended.filter(item => item.name.length >= 3 && item.name.length <= 8);
 };
 
 // Check sibling compatibility
@@ -123,13 +146,14 @@ const checkSiblingCompatibility = (name: string, siblingNames: string): boolean 
 export const generateNames = async (preferences: NamePreferences): Promise<GeneratedName[]> => {
   try {
     // Build the prompt based on preferences
-    let prompt = `Generate 12 meaningful baby names with the following criteria:
+    let prompt = `Generate 12 meaningful baby names with detailed explanations of how they connect to the parent names or preferences:
     
 Father's name: ${preferences.fatherName}
 Mother's name: ${preferences.motherName}
 Gender: ${preferences.gender}
 Religion: ${preferences.religion || 'any'}
 Culture/Language: ${preferences.culture || 'any'}
+Search Type: ${preferences.searchType || 'traditional'}
 `;
 
     if (preferences.startLetter) {
@@ -153,6 +177,12 @@ Culture/Language: ${preferences.culture || 'any'}
     }
 
     prompt += `
+For each name, provide detailed explanation of:
+1. How it relates to the parent names (if applicable)
+2. Cultural significance
+3. Meaning derivation
+4. Why it fits the preferences
+
 Please provide each name in this exact JSON format:
 {
   "name": "Name",
@@ -160,10 +190,12 @@ Please provide each name in this exact JSON format:
   "origin": "Cultural origin",
   "gender": "boy/girl/unisex",
   "pronunciation": "phonetic pronunciation",
-  "popularity": number between 1-100
+  "popularity": number between 1-100,
+  "derivation": "How this name relates to or derives from the parent names and preferences",
+  "parentConnection": "Specific connection to father/mother names if any"
 }
 
-Return an array of 12 such name objects. Focus on names that are meaningful, culturally appropriate, and have beautiful significance.`;
+Return an array of 12 such name objects. Focus on meaningful connections and beautiful derivations.`;
 
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
@@ -222,19 +254,21 @@ Return an array of 12 such name objects. Focus on names that are meaningful, cul
       return processedName;
     });
 
-    // Add blended names if rules are selected
-    const blendedNames = blendParentNames(preferences.fatherName, preferences.motherName, preferences.nameRules);
-    if (blendedNames.length > 0 && preferences.nameRules.includes('Combination of parent names')) {
-      const blendedNameObjects = blendedNames.slice(0, 3).map(blendedName => ({
-        name: blendedName.charAt(0).toUpperCase() + blendedName.slice(1),
-        meaning: `Blend of ${preferences.fatherName} and ${preferences.motherName}`,
+    // Add blended names with explanations
+    const blendedNames = blendParentNames(preferences.fatherName, preferences.motherName, preferences.nameRules, preferences.searchType);
+    if (blendedNames.length > 0) {
+      const blendedNameObjects = blendedNames.slice(0, 3).map(blendedItem => ({
+        name: blendedItem.name.charAt(0).toUpperCase() + blendedItem.name.slice(1),
+        meaning: `Creative blend of parent names`,
         origin: 'Parent blend',
         gender: preferences.gender,
-        pronunciation: blendedName.toLowerCase(),
+        pronunciation: blendedItem.name.toLowerCase(),
         popularity: 30,
-        numerology: preferences.birthDate ? calculateNumerology(blendedName) : undefined,
+        derivation: blendedItem.explanation,
+        parentConnection: `Direct combination of ${preferences.fatherName} and ${preferences.motherName}`,
+        numerology: preferences.birthDate ? calculateNumerology(blendedItem.name) : undefined,
         astrology: preferences.birthDate ? getAstrologySign(preferences.birthDate) : undefined,
-        siblingMatch: preferences.siblingNames ? checkSiblingCompatibility(blendedName, preferences.siblingNames) : undefined
+        siblingMatch: preferences.siblingNames ? checkSiblingCompatibility(blendedItem.name, preferences.siblingNames) : undefined
       }));
       
       processedNames.splice(0, 0, ...blendedNameObjects);

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,6 +14,7 @@ import { toast } from "@/hooks/use-toast";
 import NameCard from '@/components/NameCard';
 import AIChat from '@/components/AIChat';
 import { generateNames } from '@/utils/nameGenerator';
+import MagicalBackground from '@/components/MagicalBackground';
 
 interface NamePreferences {
   fatherName: string;
@@ -30,6 +30,7 @@ interface NamePreferences {
   birthDate: string;
   birthTime: string;
   nameRules: string[];
+  searchType: string; // New field
 }
 
 interface GeneratedName {
@@ -58,7 +59,8 @@ const Index = () => {
     siblingNames: '',
     birthDate: '',
     birthTime: '',
-    nameRules: []
+    nameRules: [],
+    searchType: 'traditional'
   });
 
   const [generatedNames, setGeneratedNames] = useState<GeneratedName[]>([]);
@@ -70,6 +72,15 @@ const Index = () => {
   const religions = ['Hindu', 'Christian', 'Muslim', 'Sikh', 'Buddhist', 'Jewish', 'Other'];
   const cultures = ['Sanskrit', 'Tamil', 'Hindi', 'Arabic', 'Western', 'Modern', 'Traditional', 'Hebrew', 'Greek'];
   const meanings = ['Joyful', 'Divine', 'Brave', 'Peaceful', 'Intelligent', 'Strong', 'Beautiful', 'Prosperous', 'Blessed'];
+  
+  const searchTypes = [
+    { value: 'traditional', label: 'Traditional Names' },
+    { value: 'first-letters', label: 'First Letter Combinations' },
+    { value: 'syllable-blend', label: 'Syllable Blending' },
+    { value: 'vowel-consonant', label: 'Vowel-Consonant Patterns' },
+    { value: 'meaning-based', label: 'Meaning-Based Search' },
+    { value: 'cultural-fusion', label: 'Cultural Fusion' }
+  ];
   
   const nameRuleOptions = [
     'First letter from father + last letter from mother',
@@ -139,18 +150,23 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen relative">
+      <MagicalBackground />
+      
+      <div className="relative z-10 container mx-auto px-4 py-8">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Baby className="h-8 w-8 text-purple-600" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Smart Baby Name Generator
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
+              AstroName AI
             </h1>
             <Sparkles className="h-8 w-8 text-pink-600" />
           </div>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Discover the perfect name for your little one with AI-powered suggestions
+          <p className="text-lg text-gray-700 max-w-2xl mx-auto font-medium">
+            "Where love, stars, and names align."
+          </p>
+          <p className="text-sm text-gray-600 mt-2">
+            Discover the perfect name for your little one with AI-powered suggestions and cosmic insights
           </p>
         </div>
 
@@ -163,7 +179,7 @@ const Index = () => {
           </TabsList>
 
           <TabsContent value="generator">
-            <Card className="w-full max-w-3xl mx-auto">
+            <Card className="w-full max-w-3xl mx-auto bg-white/95 backdrop-blur-sm border border-purple-100/50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-center justify-center">
                   <Moon className="h-5 w-5 text-purple-600" />
@@ -344,6 +360,27 @@ const Index = () => {
                     </div>
                   </CollapsibleContent>
                 </Collapsible>
+
+                <div className="space-y-2">
+                  <Label className="text-base font-medium">Search Type</Label>
+                  <Select value={preferences.searchType} onValueChange={(value) => handleInputChange('searchType', value)}>
+                    <SelectTrigger className="h-12 text-base">
+                      <SelectValue placeholder="Choose how to generate names" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {searchTypes.map(type => (
+                        <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {preferences.searchType === 'first-letters' && "Combines first letters from both parent names"}
+                    {preferences.searchType === 'syllable-blend' && "Blends syllables from parent names creatively"}
+                    {preferences.searchType === 'vowel-consonant' && "Uses vowel-consonant patterns from parent names"}
+                    {preferences.searchType === 'meaning-based' && "Focuses on meanings related to parent names"}
+                    {preferences.searchType === 'cultural-fusion' && "Blends cultural elements from both parents"}
+                  </p>
+                </div>
 
                 <Button 
                   onClick={handleGenerateNames} 
