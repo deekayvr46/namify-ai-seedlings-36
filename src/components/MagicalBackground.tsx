@@ -6,155 +6,180 @@ interface Star {
   x: number;
   y: number;
   size: number;
-  delay: number;
-  speed: number;
+  brightness: number;
+  twinkleSpeed: number;
+  color: string;
 }
 
-interface FallingStar {
+interface ShootingStar {
   id: number;
   x: number;
   y: number;
-  rotation: number;
-  duration: number;
-  delay: number;
+  angle: number;
+  speed: number;
+  length: number;
+  opacity: number;
 }
 
 const MagicalBackground: React.FC = () => {
   const [stars, setStars] = useState<Star[]>([]);
-  const [fallingStars, setFallingStars] = useState<FallingStar[]>([]);
+  const [shootingStars, setShootingStars] = useState<ShootingStar[]>([]);
 
   useEffect(() => {
+    // Generate realistic twinkling stars
     const generateStars = () => {
       const newStars: Star[] = [];
-      for (let i = 0; i < 80; i++) {
+      const starColors = ['#ffffff', '#fff8dc', '#ffe4b5', '#e6e6fa', '#b0e0e6'];
+      
+      for (let i = 0; i < 150; i++) {
         newStars.push({
           id: i,
           x: Math.random() * 100,
           y: Math.random() * 100,
-          size: Math.random() * 4 + 1,
-          delay: Math.random() * 8,
-          speed: Math.random() * 3 + 2
+          size: Math.random() * 2 + 0.5,
+          brightness: Math.random() * 0.8 + 0.2,
+          twinkleSpeed: Math.random() * 3 + 1,
+          color: starColors[Math.floor(Math.random() * starColors.length)]
         });
       }
       setStars(newStars);
     };
 
-    const generateFallingStars = () => {
-      const newFallingStars: FallingStar[] = [];
-      for (let i = 0; i < 12; i++) {
-        newFallingStars.push({
+    // Generate occasional shooting stars
+    const generateShootingStars = () => {
+      const newShootingStars: ShootingStar[] = [];
+      for (let i = 0; i < 3; i++) {
+        newShootingStars.push({
           id: i,
-          x: Math.random() * 120 - 10,
-          y: Math.random() * 30 - 10,
-          rotation: Math.random() * 45 + 10,
-          duration: Math.random() * 3 + 2,
-          delay: Math.random() * 10
+          x: Math.random() * 120 - 20,
+          y: Math.random() * 40,
+          angle: Math.random() * 30 + 20,
+          speed: Math.random() * 2 + 1,
+          length: Math.random() * 80 + 40,
+          opacity: 0
         });
       }
-      setFallingStars(newFallingStars);
+      setShootingStars(newShootingStars);
     };
 
     generateStars();
-    generateFallingStars();
+    generateShootingStars();
   }, []);
 
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-      {/* Dark Magical Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900 to-indigo-900" />
-      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-purple-800/20 to-pink-800/30 animate-pulse" />
+      {/* Deep space gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-indigo-950 via-purple-950 to-slate-900" />
+      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-purple-900/30 to-blue-900/20" />
       
-      {/* Twinkling Stars */}
+      {/* Realistic twinkling stars */}
       {stars.map((star) => (
         <div
           key={star.id}
-          className="absolute rounded-full animate-pulse"
+          className="absolute rounded-full"
           style={{
             left: `${star.x}%`,
             top: `${star.y}%`,
             width: `${star.size}px`,
             height: `${star.size}px`,
-            backgroundColor: star.size > 3 ? '#fbbf24' : star.size > 2 ? '#a78bfa' : '#f0abfc',
-            boxShadow: `0 0 ${star.size * 2}px ${star.size > 3 ? '#fbbf24' : star.size > 2 ? '#a78bfa' : '#f0abfc'}`,
-            animationDelay: `${star.delay}s`,
-            animationDuration: `${star.speed}s`
+            backgroundColor: star.color,
+            boxShadow: `0 0 ${star.size * 2}px ${star.color}, 0 0 ${star.size * 4}px ${star.color}`,
+            opacity: star.brightness,
+            animation: `twinkle ${star.twinkleSpeed}s ease-in-out infinite alternate`,
+            animationDelay: `${Math.random() * 2}s`
           }}
         />
       ))}
-      
-      {/* Falling/Shooting Stars */}
-      {fallingStars.map((fallingStar) => (
-        <div
-          key={fallingStar.id}
-          className="absolute w-16 h-0.5 bg-gradient-to-r from-transparent via-white to-transparent opacity-80"
-          style={{
-            left: `${fallingStar.x}%`,
-            top: `${fallingStar.y}%`,
-            transform: `rotate(${fallingStar.rotation}deg)`,
-            animation: `shooting-star ${fallingStar.duration}s ease-out ${fallingStar.delay}s infinite`,
-            boxShadow: '0 0 6px #ffffff, 0 0 12px #a78bfa, 0 0 18px #a78bfa'
-          }}
-        />
-      ))}
-      
-      {/* Floating Magical Particles */}
-      <div className="absolute inset-0">
-        {[...Array(30)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full animate-bounce"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              width: `${Math.random() * 3 + 1}px`,
-              height: `${Math.random() * 3 + 1}px`,
-              backgroundColor: i % 3 === 0 ? '#fbbf24' : i % 2 === 0 ? '#a78bfa' : '#f0abfc',
-              boxShadow: `0 0 8px ${i % 3 === 0 ? '#fbbf24' : i % 2 === 0 ? '#a78bfa' : '#f0abfc'}`,
-              animationDelay: `${Math.random() * 4}s`,
-              animationDuration: `${5 + Math.random() * 3}s`
-            }}
-          />
-        ))}
-      </div>
-      
-      {/* Mystical Aurora Glows */}
-      <div className="absolute top-1/4 left-1/5 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse" 
-           style={{ animationDuration: '4s' }} />
-      <div className="absolute bottom-1/4 right-1/5 w-64 h-64 bg-pink-500/20 rounded-full blur-3xl animate-pulse" 
-           style={{ animationDelay: '2s', animationDuration: '5s' }} />
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/15 rounded-full blur-3xl animate-pulse" 
-           style={{ animationDelay: '1s', animationDuration: '6s' }} />
-      
-      {/* Constellation Lines */}
-      <svg className="absolute inset-0 w-full h-full opacity-30">
-        <defs>
-          <linearGradient id="constellation" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#a78bfa" stopOpacity="0.8"/>
-            <stop offset="100%" stopColor="#f0abfc" stopOpacity="0.4"/>
-          </linearGradient>
-        </defs>
-        <path d="M100,100 L200,150 L300,120 L400,180" stroke="url(#constellation)" strokeWidth="1" fill="none" className="animate-pulse"/>
-        <path d="M500,200 L600,250 L700,220" stroke="url(#constellation)" strokeWidth="1" fill="none" className="animate-pulse" style={{ animationDelay: '1s' }}/>
-        <path d="M150,300 L250,350 L350,320 L450,380" stroke="url(#constellation)" strokeWidth="1" fill="none" className="animate-pulse" style={{ animationDelay: '2s' }}/>
-      </svg>
 
-      {/* Custom CSS for shooting star animation */}
+      {/* Shooting stars */}
+      {shootingStars.map((shootingStar) => (
+        <div
+          key={shootingStar.id}
+          className="absolute"
+          style={{
+            left: `${shootingStar.x}%`,
+            top: `${shootingStar.y}%`,
+            width: `${shootingStar.length}px`,
+            height: '1px',
+            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent)',
+            transform: `rotate(${shootingStar.angle}deg)`,
+            animation: `shootingStar ${4 + Math.random() * 2}s linear infinite`,
+            animationDelay: `${Math.random() * 5}s`,
+            boxShadow: '0 0 6px rgba(255,255,255,0.8)'
+          }}
+        />
+      ))}
+
+      {/* Distant nebula effects */}
+      <div 
+        className="absolute w-96 h-96 rounded-full opacity-20 blur-3xl"
+        style={{
+          top: '20%',
+          left: '10%',
+          background: 'radial-gradient(circle, rgba(138,43,226,0.3) 0%, transparent 70%)',
+          animation: 'pulse 8s ease-in-out infinite'
+        }}
+      />
+      <div 
+        className="absolute w-80 h-80 rounded-full opacity-15 blur-3xl"
+        style={{
+          bottom: '30%',
+          right: '15%',
+          background: 'radial-gradient(circle, rgba(72,61,139,0.4) 0%, transparent 70%)',
+          animation: 'pulse 6s ease-in-out infinite',
+          animationDelay: '2s'
+        }}
+      />
+
+      {/* Milky Way effect */}
+      <div 
+        className="absolute inset-0 opacity-10"
+        style={{
+          background: 'linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%)',
+          transform: 'rotate(-20deg) scale(1.5)',
+          filter: 'blur(1px)'
+        }}
+      />
+
+      {/* Custom animations */}
       <style dangerouslySetInnerHTML={{
         __html: `
-          @keyframes shooting-star {
+          @keyframes twinkle {
+            0%, 100% { 
+              opacity: 0.3;
+              transform: scale(0.8);
+            }
+            50% { 
+              opacity: 1;
+              transform: scale(1);
+            }
+          }
+          
+          @keyframes shootingStar {
             0% {
-              transform: translateX(-50px) translateY(-50px);
+              transform: translateX(-100px) translateY(-100px) rotate(var(--angle, 30deg));
               opacity: 0;
             }
             10% {
               opacity: 1;
             }
             90% {
-              opacity: 1;
+              opacity: 0.8;
             }
             100% {
-              transform: translateX(300px) translateY(300px);
+              transform: translateX(200px) translateY(200px) rotate(var(--angle, 30deg));
               opacity: 0;
+            }
+          }
+          
+          @keyframes pulse {
+            0%, 100% {
+              opacity: 0.1;
+              transform: scale(1);
+            }
+            50% {
+              opacity: 0.3;
+              transform: scale(1.1);
             }
           }
         `

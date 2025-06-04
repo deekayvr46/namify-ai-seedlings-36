@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -85,30 +84,46 @@
   }
 }
 
-/* Custom magical star animations */
+/* Realistic star animations */
 @keyframes twinkle {
   0%, 100% { 
-    opacity: 0.3; 
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  50% { 
+    opacity: 1;
     transform: scale(1);
   }
-  50% { 
-    opacity: 1; 
-    transform: scale(1.2);
+}
+
+@keyframes shootingStar {
+  0% {
+    transform: translateX(-100px) translateY(-100px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(200px) translateY(200px);
+    opacity: 0;
   }
 }
 
-@keyframes shimmer {
-  0% { 
-    box-shadow: 0 0 5px currentColor;
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.1;
+    transform: scale(1);
   }
-  50% { 
-    box-shadow: 0 0 20px currentColor, 0 0 30px currentColor;
-  }
-  100% { 
-    box-shadow: 0 0 5px currentColor;
+  50% {
+    opacity: 0.3;
+    transform: scale(1.1);
   }
 }
 
-.star-glow {
-  animation: twinkle 2s infinite, shimmer 3s infinite;
+.star-twinkle {
+  animation: twinkle 2s ease-in-out infinite alternate;
 }
