@@ -14,7 +14,7 @@ interface NamePreferences {
   birthDate: string;
   birthTime: string;
   nameRules: string[];
-  searchType: string; // New field for search types
+  searchType: string;
 }
 
 interface GeneratedName {
@@ -27,8 +27,13 @@ interface GeneratedName {
   numerology?: number;
   astrology?: string;
   siblingMatch?: boolean;
-  derivation?: string; // New field for parent name derivation
-  parentConnection?: string; // How it connects to parent names
+  derivation?: string;
+  parentConnection?: string;
+}
+
+interface ChatResponse {
+  content: string;
+  suggestions?: string[];
 }
 
 // Numerology calculation

@@ -156,30 +156,30 @@ const Index = () => {
       <div className="relative z-10 container mx-auto px-4 py-8">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Baby className="h-8 w-8 text-purple-600" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
+            <Baby className="h-8 w-8 text-purple-400" />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-300 via-pink-300 to-blue-300 bg-clip-text text-transparent">
               AstroName AI
             </h1>
-            <Sparkles className="h-8 w-8 text-pink-600" />
+            <Sparkles className="h-8 w-8 text-pink-400" />
           </div>
-          <p className="text-lg text-gray-700 max-w-2xl mx-auto font-medium">
+          <p className="text-lg text-gray-200 max-w-2xl mx-auto font-medium">
             "Where love, stars, and names align."
           </p>
-          <p className="text-sm text-gray-600 mt-2">
+          <p className="text-sm text-gray-300 mt-2">
             Discover the perfect name for your little one with AI-powered suggestions and cosmic insights
           </p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8">
-            <TabsTrigger value="generator">Name Generator</TabsTrigger>
-            <TabsTrigger value="results">Results ({generatedNames.length})</TabsTrigger>
-            <TabsTrigger value="favorites">Favorites ({favorites.length})</TabsTrigger>
-            <TabsTrigger value="chat">AI Assistant</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-4 mb-8 bg-white/10 backdrop-blur-sm border border-white/20">
+            <TabsTrigger value="generator" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white">Name Generator</TabsTrigger>
+            <TabsTrigger value="results" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white">Results ({generatedNames.length})</TabsTrigger>
+            <TabsTrigger value="favorites" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white">Favorites ({favorites.length})</TabsTrigger>
+            <TabsTrigger value="chat" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white">AI Assistant</TabsTrigger>
           </TabsList>
 
           <TabsContent value="generator">
-            <Card className="w-full max-w-3xl mx-auto bg-white/95 backdrop-blur-sm border border-purple-100/50">
+            <Card className="w-full max-w-3xl mx-auto bg-white/95 backdrop-blur-sm border border-purple-100/50 shadow-2xl">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-center justify-center">
                   <Moon className="h-5 w-5 text-purple-600" />
