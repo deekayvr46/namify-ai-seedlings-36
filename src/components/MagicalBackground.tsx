@@ -11,8 +11,20 @@ interface Star {
   color: string;
 }
 
+interface FallingStar {
+  id: number;
+  x: number;
+  y: number;
+  size: number;
+  speed: number;
+  angle: number;
+  opacity: number;
+  trail: { x: number; y: number; opacity: number }[];
+}
+
 const MagicalBackground: React.FC = () => {
   const [stars, setStars] = useState<Star[]>([]);
+  const [fallingStars, setFallingStars] = useState<FallingStar[]>([]);
 
   useEffect(() => {
     // Generate realistic twinkling stars
@@ -35,6 +47,62 @@ const MagicalBackground: React.FC = () => {
     };
 
     generateStars();
+  }, []);
+
+  useEffect(() => {
+    // Generate falling stars periodically
+    const generateFallingStar = () => {
+      const newFallingStar: FallingStar = {
+        id: Date.now() + Math.random(),
+        x: Math.random() * 120 - 20, // Start slightly off screen
+        y: -10,
+        size: Math.random() * 3 + 1,
+        speed: Math.random() * 2 + 1,
+        angle: Math.random() * 30 + 15, // 15-45 degree angle
+        opacity: Math.random() * 0.8 + 0.2,
+        trail: []
+      };
+      
+      setFallingStars(prev => [...prev, newFallingStar]);
+    };
+
+    // Create falling stars every 3-8 seconds
+    const interval = setInterval(() => {
+      if (Math.random() > 0.7) { // 30% chance each interval
+        generateFallingStar();
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    // Animate falling stars
+    const animateStars = () => {
+      setFallingStars(prev => 
+        prev.map(star => {
+          const newX = star.x + Math.cos(star.angle * Math.PI / 180) * star.speed;
+          const newY = star.y + Math.sin(star.angle * Math.PI / 180) * star.speed;
+          
+          // Add to trail
+          const newTrail = [...star.trail, { x: star.x, y: star.y, opacity: star.opacity }];
+          if (newTrail.length > 8) newTrail.shift(); // Keep trail length manageable
+          
+          return {
+            ...star,
+            x: newX,
+            y: newY,
+            trail: newTrail.map((point, index) => ({
+              ...point,
+              opacity: point.opacity * (index / newTrail.length) * 0.5
+            }))
+          };
+        }).filter(star => star.x < 120 && star.y < 120) // Remove stars that are off screen
+      );
+    };
+
+    const animationInterval = setInterval(animateStars, 50);
+    return () => clearInterval(animationInterval);
   }, []);
 
   return (
@@ -60,6 +128,41 @@ const MagicalBackground: React.FC = () => {
             animationDelay: `${Math.random() * 2}s`
           }}
         />
+      ))}
+
+      {/* Animated falling stars */}
+      {fallingStars.map((star) => (
+        <div key={star.id}>
+          {/* Star trail */}
+          {star.trail.map((point, index) => (
+            <div
+              key={index}
+              className="absolute rounded-full bg-white"
+              style={{
+                left: `${point.x}%`,
+                top: `${point.y}%`,
+                width: `${star.size * 0.5}px`,
+                height: `${star.size * 0.5}px`,
+                opacity: point.opacity,
+                boxShadow: `0 0 ${star.size}px rgba(255,255,255,${point.opacity})`
+              }}
+            />
+          ))}
+          
+          {/* Main falling star */}
+          <div
+            className="absolute rounded-full bg-white"
+            style={{
+              left: `${star.x}%`,
+              top: `${star.y}%`,
+              width: `${star.size}px`,
+              height: `${star.size}px`,
+              opacity: star.opacity,
+              boxShadow: `0 0 ${star.size * 3}px white, 0 0 ${star.size * 6}px rgba(255,255,255,0.5)`,
+              transform: `rotate(${star.angle}deg)`
+            }}
+          />
+        </div>
       ))}
 
       {/* Distant nebula effects */}

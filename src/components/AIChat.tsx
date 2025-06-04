@@ -53,6 +53,7 @@ const AIChat: React.FC<AIChatProps> = ({ preferences }) => {
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
@@ -78,47 +79,92 @@ const AIChat: React.FC<AIChatProps> = ({ preferences }) => {
   }, [messages.length]);
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
+    console.log('Send message clicked, input:', inputMessage);
+    
+    if (!inputMessage.trim()) {
+      console.log('Empty message, returning');
+      return;
+    }
+
+    if (isLoading || isTyping) {
+      console.log('Already processing, returning');
+      return;
+    }
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       type: 'user',
-      content: inputMessage,
+      content: inputMessage.trim(),
       timestamp: new Date()
     };
 
+    console.log('Adding user message:', userMessage);
     setMessages(prev => [...prev, userMessage]);
     setInputMessage('');
     setIsTyping(true);
+    setIsLoading(true);
 
     try {
-      const response = await chatWithAI(inputMessage, preferences);
+      console.log('Calling chatWithAI with:', inputMessage, preferences);
+      
+      const response = await chatWithAI(inputMessage.trim(), preferences);
+      
+      console.log('Got AI response:', response);
+      
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
-        content: response.content,
+        content: response.content || "I'm sorry, I couldn't generate a proper response. Please try again.",
         timestamp: new Date(),
-        suggestions: response.suggestions
+        suggestions: response.suggestions || []
       };
+      
+      console.log('Adding assistant message:', assistantMessage);
       setMessages(prev => [...prev, assistantMessage]);
+      
+      toast({
+        title: "Response received",
+        description: "AI assistant replied successfully!",
+      });
+      
     } catch (error) {
+      console.error('Chat error:', error);
+      
+      const errorMessage: ChatMessage = {
+        id: (Date.now() + 2).toString(),
+        type: 'assistant',
+        content: "I'm sorry, I'm having trouble connecting right now. Please check your internet connection and try again.",
+        timestamp: new Date(),
+        suggestions: [
+          "Try a simpler question",
+          "Ask about traditional names",
+          "What are popular baby names?"
+        ]
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
+      
       toast({
         title: "Chat Error",
-        description: "Failed to get response from AI assistant.",
+        description: "Failed to get response from AI assistant. Please try again.",
         variant: "destructive"
       });
     } finally {
+      console.log('Resetting loading states');
       setIsTyping(false);
+      setIsLoading(false);
     }
   };
 
   const handleSuggestionClick = (suggestion: string) => {
+    console.log('Suggestion clicked:', suggestion);
     setInputMessage(suggestion);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
+      console.log('Enter key pressed');
       handleSendMessage();
     }
   };
@@ -161,7 +207,7 @@ const AIChat: React.FC<AIChatProps> = ({ preferences }) => {
                   <p className="whitespace-pre-wrap">{message.content}</p>
                 </div>
                 
-                {message.suggestions && (
+                {message.suggestions && message.suggestions.length > 0 && (
                   <div className="mt-3 space-y-2">
                     <p className="text-sm text-gray-600 font-medium">Try asking:</p>
                     <div className="flex flex-wrap gap-2">
@@ -218,14 +264,18 @@ const AIChat: React.FC<AIChatProps> = ({ preferences }) => {
               onKeyPress={handleKeyPress}
               placeholder="Ask me about baby names..."
               className="flex-1"
-              disabled={isTyping}
+              disabled={isTyping || isLoading}
             />
             <Button
               onClick={handleSendMessage}
-              disabled={!inputMessage.trim() || isTyping}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+              disabled={!inputMessage.trim() || isTyping || isLoading}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:opacity-50"
             >
-              <Send className="h-4 w-4" />
+              {isLoading ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
             </Button>
           </div>
         </div>
