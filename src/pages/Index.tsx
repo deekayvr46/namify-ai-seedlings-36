@@ -214,11 +214,23 @@ const Index = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8 bg-white/10 backdrop-blur-sm border border-white/20">
-            <TabsTrigger value="generator" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white">Name Generator</TabsTrigger>
-            <TabsTrigger value="results" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white">Results ({generatedNames.length})</TabsTrigger>
-            <TabsTrigger value="favorites" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white">Favorites ({favorites.length})</TabsTrigger>
-            <TabsTrigger value="chat" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white">AI Assistant</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 mb-8 bg-white/10 backdrop-blur-sm border border-white/20">
+            <TabsTrigger value="generator" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white text-xs sm:text-sm">
+              <span className="hidden sm:inline">Name Generator</span>
+              <span className="sm:hidden">Generator</span>
+            </TabsTrigger>
+            <TabsTrigger value="results" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white text-xs sm:text-sm">
+              <span className="hidden sm:inline">Results ({generatedNames.length})</span>
+              <span className="sm:hidden">Results ({generatedNames.length})</span>
+            </TabsTrigger>
+            <TabsTrigger value="favorites" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white text-xs sm:text-sm">
+              <span className="hidden sm:inline">Favorites ({favorites.length})</span>
+              <span className="sm:hidden">Favorites ({favorites.length})</span>
+            </TabsTrigger>
+            <TabsTrigger value="chat" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white text-xs sm:text-sm">
+              <span className="hidden sm:inline">AI Assistant</span>
+              <span className="sm:hidden">AI Chat</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="generator">
@@ -469,7 +481,7 @@ const Index = () => {
                 </div>
               )}
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {generatedNames.map((name, index) => (
                   <NameCard
                     key={index}
@@ -511,7 +523,7 @@ const Index = () => {
                 </div>
               )}
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {favorites.map((name, index) => (
                   <NameCard
                     key={index}
