@@ -139,24 +139,26 @@ const MagicalBackground: React.FC = () => {
       </svg>
 
       {/* Custom CSS for shooting star animation */}
-      <style jsx>{`
-        @keyframes shooting-star {
-          0% {
-            transform: translateX(-50px) translateY(-50px) rotate(var(--rotation));
-            opacity: 0;
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          @keyframes shooting-star {
+            0% {
+              transform: translateX(-50px) translateY(-50px);
+              opacity: 0;
+            }
+            10% {
+              opacity: 1;
+            }
+            90% {
+              opacity: 1;
+            }
+            100% {
+              transform: translateX(300px) translateY(300px);
+              opacity: 0;
+            }
           }
-          10% {
-            opacity: 1;
-          }
-          90% {
-            opacity: 1;
-          }
-          100% {
-            transform: translateX(300px) translateY(300px) rotate(var(--rotation));
-            opacity: 0;
-          }
-        }
-      `}</style>
+        `
+      }} />
     </div>
   );
 };

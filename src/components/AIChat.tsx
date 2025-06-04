@@ -21,6 +21,7 @@ interface NamePreferences {
   birthDate: string;
   birthTime: string;
   nameRules: string[];
+  searchType: string;
 }
 
 interface ChatMessage {
