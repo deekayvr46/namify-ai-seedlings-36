@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -170,52 +171,53 @@ const AIChat: React.FC<AIChatProps> = ({ preferences }) => {
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto h-[600px] flex flex-col bg-white/95 backdrop-blur-sm border border-purple-100/50">
-      <CardHeader className="pb-3 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-purple-100">
-        <CardTitle className="flex items-center gap-2">
-          <Bot className="h-5 w-5 text-purple-600" />
-          AstroName AI Assistant
-          <Sparkles className="h-4 w-4 text-pink-500" />
+    <Card className="w-full max-w-4xl mx-auto h-[500px] sm:h-[600px] flex flex-col bg-white/95 backdrop-blur-sm border border-purple-100/50">
+      <CardHeader className="pb-3 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-purple-100 px-3 sm:px-6">
+        <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+          <Bot className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
+          <span className="hidden sm:inline">AstroName AI Assistant</span>
+          <span className="sm:hidden">AI Assistant</span>
+          <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-pink-500" />
         </CardTitle>
       </CardHeader>
       
       <CardContent className="flex-1 flex flex-col p-0">
         <div 
           ref={messagesContainerRef}
-          className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth"
+          className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-3 sm:space-y-4 scroll-smooth"
           style={{ scrollBehavior: 'smooth' }}
         >
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}
+              className={`flex gap-2 sm:gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}
             >
               {message.type === 'assistant' && (
-                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
-                  <Bot className="h-4 w-4 text-white" />
+                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
+                  <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                 </div>
               )}
               
-              <div className={`max-w-[80%] ${message.type === 'user' ? 'order-2' : ''}`}>
+              <div className={`max-w-[85%] sm:max-w-[80%] ${message.type === 'user' ? 'order-2' : ''}`}>
                 <div
-                  className={`p-3 rounded-lg ${
+                  className={`p-2 sm:p-3 rounded-lg text-sm sm:text-base ${
                     message.type === 'user'
                       ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
                       : 'bg-gray-100 text-gray-800'
                   }`}
                 >
-                  <p className="whitespace-pre-wrap">{message.content}</p>
+                  <p className="whitespace-pre-wrap break-words">{message.content}</p>
                 </div>
                 
                 {message.suggestions && message.suggestions.length > 0 && (
-                  <div className="mt-3 space-y-2">
-                    <p className="text-sm text-gray-600 font-medium">Try asking:</p>
-                    <div className="flex flex-wrap gap-2">
+                  <div className="mt-2 sm:mt-3 space-y-2">
+                    <p className="text-xs sm:text-sm text-gray-600 font-medium">Try asking:</p>
+                    <div className="flex flex-wrap gap-1 sm:gap-2">
                       {message.suggestions.map((suggestion, index) => (
                         <Badge
                           key={index}
                           variant="outline"
-                          className="cursor-pointer hover:bg-purple-50 hover:border-purple-300 transition-colors"
+                          className="cursor-pointer hover:bg-purple-50 hover:border-purple-300 transition-colors text-xs sm:text-sm px-2 py-1"
                           onClick={() => handleSuggestionClick(suggestion)}
                         >
                           {suggestion}
@@ -225,25 +227,25 @@ const AIChat: React.FC<AIChatProps> = ({ preferences }) => {
                   </div>
                 )}
                 
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-gray-500 mt-1 sm:mt-2">
                   {message.timestamp.toLocaleTimeString()}
                 </p>
               </div>
               
               {message.type === 'user' && (
-                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0 order-3">
-                  <User className="h-4 w-4 text-white" />
+                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0 order-3">
+                  <User className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                 </div>
               )}
             </div>
           ))}
           
           {isTyping && (
-            <div className="flex gap-3 justify-start">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
-                <Bot className="h-4 w-4 text-white" />
+            <div className="flex gap-2 sm:gap-3 justify-start">
+              <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
+                <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
               </div>
-              <div className="bg-gray-100 p-3 rounded-lg">
+              <div className="bg-gray-100 p-2 sm:p-3 rounded-lg">
                 <div className="flex space-x-1">
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
@@ -256,25 +258,26 @@ const AIChat: React.FC<AIChatProps> = ({ preferences }) => {
           <div ref={messagesEndRef} />
         </div>
         
-        <div className="border-t p-4">
+        <div className="border-t p-2 sm:p-4">
           <div className="flex gap-2">
             <Input
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Ask me about baby names..."
-              className="flex-1"
+              className="flex-1 text-sm sm:text-base h-10 sm:h-auto"
               disabled={isTyping || isLoading}
             />
             <Button
               onClick={handleSendMessage}
               disabled={!inputMessage.trim() || isTyping || isLoading}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:opacity-50"
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 px-3 sm:px-4"
+              size="sm"
             >
               {isLoading ? (
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
-                <Send className="h-4 w-4" />
+                <Send className="h-3 w-3 sm:h-4 sm:w-4" />
               )}
             </Button>
           </div>
