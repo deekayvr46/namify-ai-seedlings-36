@@ -172,55 +172,55 @@ const AIChat: React.FC<AIChatProps> = ({ preferences }) => {
 
   return (
     <Card className="w-full max-w-4xl mx-auto h-[500px] sm:h-[600px] flex flex-col bg-white/95 backdrop-blur-sm border border-purple-100/50">
-      <CardHeader className="pb-3 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-purple-100 px-3 sm:px-6">
+      <CardHeader className="pb-3 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-purple-100 px-3 sm:px-6 flex-shrink-0">
         <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
-          <Bot className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
-          <span className="hidden sm:inline">AstroName AI Assistant</span>
-          <span className="sm:hidden">AI Assistant</span>
-          <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-pink-500" />
+          <Bot className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 flex-shrink-0" />
+          <span className="hidden sm:inline truncate">AstroName AI Assistant</span>
+          <span className="sm:hidden truncate">AI Assistant</span>
+          <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-pink-500 flex-shrink-0" />
         </CardTitle>
       </CardHeader>
       
-      <CardContent className="flex-1 flex flex-col p-0">
+      <CardContent className="flex-1 flex flex-col p-0 min-h-0">
         <div 
           ref={messagesContainerRef}
-          className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-3 sm:space-y-4 scroll-smooth"
+          className="flex-1 overflow-y-auto overflow-x-hidden p-2 sm:p-4 space-y-3 sm:space-y-4 scroll-smooth"
           style={{ scrollBehavior: 'smooth' }}
         >
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`flex gap-2 sm:gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}
+              className={`flex gap-2 sm:gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in w-full`}
             >
               {message.type === 'assistant' && (
-                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0 mt-1">
                   <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                 </div>
               )}
               
-              <div className={`max-w-[85%] sm:max-w-[80%] ${message.type === 'user' ? 'order-2' : ''}`}>
+              <div className={`min-w-0 flex-1 max-w-[calc(100%-3rem)] sm:max-w-[calc(80%-3rem)] ${message.type === 'user' ? 'order-2' : ''}`}>
                 <div
-                  className={`p-2 sm:p-3 rounded-lg text-sm sm:text-base ${
+                  className={`p-3 sm:p-4 rounded-lg text-sm sm:text-base word-wrap break-words ${
                     message.type === 'user'
-                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white ml-auto'
                       : 'bg-gray-100 text-gray-800'
                   }`}
                 >
-                  <p className="whitespace-pre-wrap break-words">{message.content}</p>
+                  <p className="whitespace-pre-wrap break-words leading-relaxed">{message.content}</p>
                 </div>
                 
                 {message.suggestions && message.suggestions.length > 0 && (
-                  <div className="mt-2 sm:mt-3 space-y-2">
+                  <div className="mt-2 sm:mt-3 space-y-2 w-full">
                     <p className="text-xs sm:text-sm text-gray-600 font-medium">Try asking:</p>
-                    <div className="flex flex-wrap gap-1 sm:gap-2">
+                    <div className="flex flex-wrap gap-1 sm:gap-2 w-full">
                       {message.suggestions.map((suggestion, index) => (
                         <Badge
                           key={index}
                           variant="outline"
-                          className="cursor-pointer hover:bg-purple-50 hover:border-purple-300 transition-colors text-xs sm:text-sm px-2 py-1"
+                          className="cursor-pointer hover:bg-purple-50 hover:border-purple-300 transition-colors text-xs px-2 py-1 max-w-full break-words whitespace-normal text-left"
                           onClick={() => handleSuggestionClick(suggestion)}
                         >
-                          {suggestion}
+                          <span className="break-words">{suggestion}</span>
                         </Badge>
                       ))}
                     </div>
@@ -233,7 +233,7 @@ const AIChat: React.FC<AIChatProps> = ({ preferences }) => {
               </div>
               
               {message.type === 'user' && (
-                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0 order-3">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0 order-3 mt-1">
                   <User className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                 </div>
               )}
@@ -241,7 +241,7 @@ const AIChat: React.FC<AIChatProps> = ({ preferences }) => {
           ))}
           
           {isTyping && (
-            <div className="flex gap-2 sm:gap-3 justify-start">
+            <div className="flex gap-2 sm:gap-3 justify-start w-full">
               <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
                 <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
               </div>
@@ -258,20 +258,20 @@ const AIChat: React.FC<AIChatProps> = ({ preferences }) => {
           <div ref={messagesEndRef} />
         </div>
         
-        <div className="border-t p-2 sm:p-4">
-          <div className="flex gap-2">
+        <div className="border-t p-2 sm:p-4 flex-shrink-0">
+          <div className="flex gap-2 w-full">
             <Input
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Ask me about baby names..."
-              className="flex-1 text-sm sm:text-base h-10 sm:h-auto"
+              className="flex-1 text-sm sm:text-base h-10 sm:h-auto min-w-0"
               disabled={isTyping || isLoading}
             />
             <Button
               onClick={handleSendMessage}
               disabled={!inputMessage.trim() || isTyping || isLoading}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 px-3 sm:px-4"
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 px-3 sm:px-4 flex-shrink-0"
               size="sm"
             >
               {isLoading ? (
