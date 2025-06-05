@@ -214,24 +214,38 @@ const Index = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 mb-8 bg-white/10 backdrop-blur-sm border border-white/20">
-            <TabsTrigger value="generator" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white text-xs sm:text-sm">
-              <span className="hidden sm:inline">Name Generator</span>
-              <span className="sm:hidden">Generator</span>
-            </TabsTrigger>
-            <TabsTrigger value="results" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white text-xs sm:text-sm">
-              <span className="hidden sm:inline">Results ({generatedNames.length})</span>
-              <span className="sm:hidden">Results ({generatedNames.length})</span>
-            </TabsTrigger>
-            <TabsTrigger value="favorites" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white text-xs sm:text-sm">
-              <span className="hidden sm:inline">Favorites ({favorites.length})</span>
-              <span className="sm:hidden">Favorites ({favorites.length})</span>
-            </TabsTrigger>
-            <TabsTrigger value="chat" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white text-xs sm:text-sm">
-              <span className="hidden sm:inline">AI Assistant</span>
-              <span className="sm:hidden">AI Chat</span>
-            </TabsTrigger>
-          </TabsList>
+          <div className="w-full overflow-x-auto mb-8">
+            <TabsList className="flex w-max min-w-full bg-white/10 backdrop-blur-sm border border-white/20 h-12">
+              <TabsTrigger 
+                value="generator" 
+                className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white text-xs sm:text-sm px-3 sm:px-6 whitespace-nowrap"
+              >
+                <span className="hidden sm:inline">Name Generator</span>
+                <span className="sm:hidden">Generator</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="results" 
+                className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white text-xs sm:text-sm px-3 sm:px-6 whitespace-nowrap"
+              >
+                <span className="hidden sm:inline">Results ({generatedNames.length})</span>
+                <span className="sm:hidden">Results ({generatedNames.length})</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="favorites" 
+                className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white text-xs sm:text-sm px-3 sm:px-6 whitespace-nowrap"
+              >
+                <span className="hidden sm:inline">Favorites ({favorites.length})</span>
+                <span className="sm:hidden">Favorites ({favorites.length})</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="chat" 
+                className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white text-xs sm:text-sm px-3 sm:px-6 whitespace-nowrap"
+              >
+                <span className="hidden sm:inline">AI Assistant</span>
+                <span className="sm:hidden">AI Chat</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="generator">
             <Card className="w-full max-w-3xl mx-auto bg-white/95 backdrop-blur-sm border border-purple-100/50 shadow-2xl">
